@@ -1,0 +1,9 @@
+?start: design
+design: UCASE SIZE flower* INT+
+flower: INT+ LCASE
+
+SIZE: ("S"|"L")
+%import common.LCASE_LETTER -> LCASE
+%import common.UCASE_LETTER -> UCASE
+%import common.INT
+%ignore "\n"
