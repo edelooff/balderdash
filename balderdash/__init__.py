@@ -12,9 +12,40 @@ def bouquet_from_designs(
 ) -> Optional[Bouquet]:
     """Attempts to create a bouquet from each correctly sized design."""
     for design in (design for design in designs if design.size == size):
-        if (bouquet := make_bouquet(design, pool, demand)) is not None:
+        if (bouquet := create_bouquet(design, pool, demand)) is not None:
             return bouquet
     return None
+
+
+def bouquet_to_string(bouquet: Bouquet) -> str:
+    """Returns a string representation of the given Bouquet."""
+    flowers = sorted(bouquet.flowers.items())
+    flowers_formatted = (f"{count}{flower.species}" for flower, count in flowers)
+    return f"{bouquet.name}{bouquet.size}{''.join(flowers_formatted)}"
+
+
+def create_bouquet(
+    design: Design, pool: FlowerCounter, demand: FlowerCounter
+) -> Optional[Bouquet]:
+    for flower, qty in design.required.items():
+        if pool[flower] < qty:
+            return None
+    remainder = pool - design.required
+    remainder = Counter(flw for flw in remainder.elements() if flw.size == design.size)
+    if sum(remainder.values()) < design.additional:
+        return None
+    bouquet = Bouquet(design.name, design.size, design.required.copy())
+    stress = {flower: demand[flower] / qty for flower, qty in remainder.items()}
+    for _ in range(design.additional):
+        flower = min(stress, key=stress.get)
+        remainder[flower] -= 1
+        bouquet.flowers[flower] += 1
+        try:
+            stress[flower] = demand[flower] / remainder[flower]
+        except ZeroDivisionError:
+            del remainder[flower], stress[flower]
+    pool -= bouquet.flowers
+    return bouquet
 
 
 def design_complexity(design: Design) -> int:
@@ -46,37 +77,6 @@ def generate_bouquets(
         yield bouquet
 
 
-def make_bouquet(
-    design: Design, pool: FlowerCounter, demand: FlowerCounter
-) -> Optional[Bouquet]:
-    for flower, qty in design.required.items():
-        if pool[flower] < qty:
-            return None
-    remainder = pool - design.required
-    remainder = Counter(flw for flw in remainder.elements() if flw.size == design.size)
-    if sum(remainder.values()) < design.additional:
-        return None
-    bouquet = Bouquet(design.name, design.size, design.required.copy())
-    stress = {flower: demand[flower] / qty for flower, qty in remainder.items()}
-    for _ in range(design.additional):
-        flower = min(stress, key=stress.get)
-        remainder[flower] -= 1
-        bouquet.flowers[flower] += 1
-        try:
-            stress[flower] = demand[flower] / remainder[flower]
-        except ZeroDivisionError:
-            del remainder[flower], stress[flower]
-    pool -= bouquet.flowers
-    return bouquet
-
-
-def bouquet_string(bouquet: Bouquet) -> str:
-    """Returns a string representation of the given Bouquet."""
-    flowers = sorted(bouquet.flowers.items())
-    flowers_formatted = (f"{count}{flower.species}" for flower, count in flowers)
-    return f"{bouquet.name}{bouquet.size}{''.join(flowers_formatted)}"
-
-
 def read_inputs(fp: TextIO) -> Iterator[str]:
     """Yields lines from the given filepointer until an empty line is hit."""
     while line := fp.readline().strip():
@@ -88,4 +88,4 @@ def main() -> None:
     designs.sort(key=design_complexity, reverse=True)
     flowers = generate_flowers(read_inputs(sys.stdin))
     for bouquet in generate_bouquets(flowers, designs):
-        print(bouquet_string(bouquet))
+        print(bouquet_to_string(bouquet))
