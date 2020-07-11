@@ -27,9 +27,8 @@ def bouquet_to_string(bouquet: Bouquet) -> str:
 def create_bouquet(
     design: Design, pool: FlowerCounter, demand: FlowerCounter
 ) -> Optional[Bouquet]:
-    for flower, qty in design.required.items():
-        if pool[flower] < qty:
-            return None
+    if any(pool[flower] < qty for flower, qty in design.required.items()):
+        return None
     remainder = pool - design.required
     remainder = Counter(flw for flw in remainder.elements() if flw.size == design.size)
     if sum(remainder.values()) < design.additional:
