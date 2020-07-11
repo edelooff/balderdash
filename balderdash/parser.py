@@ -1,4 +1,3 @@
-import sys
 from functools import partial
 from collections import Counter
 from operator import attrgetter
@@ -43,14 +42,3 @@ def generate_designs(designs: Iterable[str]) -> Iterator[Design]:
     """Yields parsed Designs from an iterable of design specifications."""
     parser = Lark.open("design.lark", rel_to=__file__)
     return map(partial(create_design, parser), designs)
-
-
-def main(*designs: str) -> None:
-    """Parses commandline parameters into Designs using Lark parser."""
-    parser = Lark.open("design.lark")
-    for design in designs:
-        print(create_design(parser, design))
-
-
-if __name__ == "__main__":
-    main(*sys.argv[1:])
