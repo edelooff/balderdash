@@ -7,6 +7,16 @@ from .parser import generate_designs, generate_flowers
 from .types import Bouquet, Design, Flower, FlowerCounter
 
 
+def bouquet_from_designs(
+    size: str, designs: Iterable[Design], pool: FlowerCounter, demand: FlowerCounter
+) -> Optional[Bouquet]:
+    """Attempts to create a bouquet from each correctly sized design."""
+    for design in (design for design in designs if design.size == size):
+        if (bouquet := make_bouquet(design, pool, demand)) is not None:
+            return bouquet
+    return None
+
+
 def design_complexity(design: Design) -> int:
     """Returns an approximation of the design's complexity to create."""
     diversity = 3 * len(design.required)
@@ -29,17 +39,11 @@ def generate_bouquets(
     for flower in flowers:
         pool[flower] += 1
         if (pool_size := (pool_size + 1)) > buffer:
-            for design in designs:
-                if (bouquet := make_bouquet(design, pool, demand)) is not None:
-                    yield bouquet
-                    pool_size = sum(pool.values())
-    while True:
-        for design in designs:
-            if (bouquet := make_bouquet(design, pool, demand)) is not None:
+            if bouquet := bouquet_from_designs(flower.size, designs, pool, demand):
                 yield bouquet
-                break
-        if bouquet is None:
-            return
+                pool_size = sum(pool.values())
+    while bouquet := bouquet_from_designs(flower.size, designs, pool, demand):
+        yield bouquet
 
 
 def make_bouquet(
