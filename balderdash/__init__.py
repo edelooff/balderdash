@@ -7,6 +7,13 @@ from .parser import generate_designs, generate_flowers
 from .types import Bouquet, Design, Flower, FlowerCounter
 
 
+def design_complexity(design: Design) -> int:
+    """Returns an approximation of the design's complexity to create."""
+    diversity = 3 * len(design.required)
+    abundance = 2 * sum(design.required.values())
+    return diversity + abundance + design.additional
+
+
 def flower_demand(designs: Iterable[Design]) -> FlowerCounter:
     """Returns a dict of flowers and amount required across all designs."""
     elements = (design.required.elements() for design in designs)
@@ -14,15 +21,25 @@ def flower_demand(designs: Iterable[Design]) -> FlowerCounter:
 
 
 def generate_bouquets(
-    flowers: Iterable[Flower], designs: Iterable[Design]
+    flowers: Iterator[Flower], designs: Iterable[Design], buffer: int = 250
 ) -> Iterator[Bouquet]:
     demand = flower_demand(designs)
     pool: FlowerCounter = Counter()
+    pool_size = 0
     for flower in flowers:
         pool[flower] += 1
-        for design in (design for design in designs if design.size == flower.size):
+        if (pool_size := (pool_size + 1)) > buffer:
+            for design in designs:
+                if (bouquet := make_bouquet(design, pool, demand)) is not None:
+                    yield bouquet
+                    pool_size = sum(pool.values())
+    while True:
+        for design in designs:
             if (bouquet := make_bouquet(design, pool, demand)) is not None:
                 yield bouquet
+                break
+        if bouquet is None:
+            return
 
 
 def make_bouquet(
@@ -64,6 +81,7 @@ def read_inputs(fp: TextIO) -> Iterator[str]:
 
 def main() -> None:
     designs = list(generate_designs(read_inputs(sys.stdin)))
-    flower_stream = generate_flowers(read_inputs(sys.stdin))
-    for bouquet in generate_bouquets(flower_stream, designs):
+    designs.sort(key=design_complexity, reverse=True)
+    flowers = generate_flowers(read_inputs(sys.stdin))
+    for bouquet in generate_bouquets(flowers, designs):
         print(bouquet_string(bouquet))
