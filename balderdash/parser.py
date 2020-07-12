@@ -10,9 +10,9 @@ from .types import Design, Flower, FlowerCounter
 
 def create_design(parser: Lark, design: str) -> Design:
     try:
-        tree = parser.parse(design, start="design")
+        tree = parser.parse(design)
     except LarkError as exc:
-        raise ValueError("Bad design syntax") from exc
+        raise ValueError(f"Bad design syntax in {design!r}") from exc
     name, size, *required_flowers, total_count = tree.children
     required: FlowerCounter = Counter()
     for count, species in map(attrgetter("children"), required_flowers):
@@ -26,19 +26,24 @@ def create_design(parser: Lark, design: str) -> Design:
 
 def create_flower(parser: Lark, flower: str) -> Flower:
     try:
-        tree = parser.parse(flower, start="flower")
+        tree = parser.parse(flower)
     except LarkError as exc:
-        raise ValueError("Bad flower syntax") from exc
+        raise ValueError(f"Bad flower syntax in {flower!r}") from exc
     return Flower(*map(str, tree.children))
 
 
 def generate_flowers(flowers: Iterable[str]) -> Iterator[Flower]:
     """Yields parsed Flowers from an iterable of flower specifications."""
-    parser = Lark.open("design.lark", rel_to=__file__)
+    parser = get_parser("flower")
     return map(partial(create_flower, parser), flowers)
 
 
 def generate_designs(designs: Iterable[str]) -> Iterator[Design]:
     """Yields parsed Designs from an iterable of design specifications."""
-    parser = Lark.open("design.lark", rel_to=__file__)
+    parser = get_parser("design")
     return map(partial(create_design, parser), designs)
+
+
+def get_parser(start: str) -> Lark:
+    """Creates an LALR parser from the balderdash grammar with given start."""
+    return Lark.open("balderdash.lark", parser="lalr", start=start, rel_to=__file__)
