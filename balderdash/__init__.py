@@ -12,16 +12,14 @@ def bouquet_from_designs(
 ) -> Optional[Bouquet]:
     """Attempts to create a bouquet from each available design in turn."""
     for design in designs:
-        if any(pool[flower] < qty for flower, qty in design.required.items()):
-            continue
-        unused = (pool - design.required).elements()
-        remainder = Counter(flower for flower in unused if flower.size == design.size)
-        if sum(remainder.values()) < design.additional:
-            continue
-        filler = select_filler(remainder, demand)
-        flowers = design.required + Counter(islice(filler, design.additional))
-        pool -= flowers
-        return Bouquet(design.name, design.size, flowers)
+        if all(pool[flower] >= qty for flower, qty in design.required.items()):
+            unused = (pool - design.required).elements()
+            remainder = [flower for flower in unused if flower.size == design.size]
+            if len(remainder) >= design.additional:
+                filler = select_filler(Counter(remainder), demand)
+                flowers = design.required + Counter(islice(filler, design.additional))
+                pool -= flowers
+                return Bouquet(design.name, design.size, flowers)
     return None
 
 
