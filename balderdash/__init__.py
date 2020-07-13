@@ -12,24 +12,14 @@ def bouquet_from_designs(
 ) -> Optional[Bouquet]:
     """Attempts to create a bouquet from each available design in turn."""
     for design in designs:
-        if any(pool[flower] < qty for flower, qty in design.required.items()):
-            continue
-        unused = (pool - design.required).elements()
-        remainder = Counter(flower for flower in unused if flower.size == design.size)
-        if sum(remainder.values()) < design.additional:
-            continue
-        bouquet = Bouquet(design.name, design.size, design.required.copy())
-        stress = {flower: demand[flower] / qty for flower, qty in remainder.items()}
-        for _ in range(design.additional):
-            flower = min(stress, key=stress.get)
-            remainder[flower] -= 1
-            bouquet.flowers[flower] += 1
-            try:
-                stress[flower] = demand[flower] / remainder[flower]
-            except ZeroDivisionError:
-                del remainder[flower], stress[flower]
-        pool -= bouquet.flowers
-        return bouquet
+        if all(pool[flower] >= qty for flower, qty in design.required.items()):
+            unused = (pool - design.required).elements()
+            remainder = [flower for flower in unused if flower.size == design.size]
+            if len(remainder) >= design.additional:
+                filler = select_filler(Counter(remainder), demand)
+                flowers = design.required + Counter(islice(filler, design.additional))
+                pool -= flowers
+                return Bouquet(design.name, design.size, flowers)
     return None
 
 
@@ -65,6 +55,18 @@ def generate_bouquets(
             buffer = sum(bouquet.flowers.values())
     while bouquet := bouquet_from_designs(designs, pool, demand):
         yield bouquet
+
+
+def select_filler(pool: FlowerCounter, demand: FlowerCounter) -> Iterator[Flower]:
+    """Yields Flower least in demand relative to its availability."""
+    stress = {flower: demand[flower] / qty for flower, qty in pool.items()}
+    while True:
+        yield (flower := min(stress, key=stress.get))
+        pool[flower] -= 1
+        try:
+            stress[flower] = demand[flower] / pool[flower]
+        except ZeroDivisionError:
+            del pool[flower], stress[flower]
 
 
 def read_inputs(fp: TextIO) -> Iterator[str]:
