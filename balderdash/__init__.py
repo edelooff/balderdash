@@ -59,14 +59,14 @@ def generate_bouquets(
 
 def select_filler(pool: FlowerCounter, demand: FlowerCounter) -> Iterator[Flower]:
     """Yields Flower least in demand relative to its availability."""
-    stress = {flower: demand[flower] / qty for flower, qty in pool.items()}
+    scarcity = {flower: demand[flower] / pool[flower] for flower in pool}
     while True:
-        yield (flower := min(stress, key=stress.get))
+        yield (flower := min(scarcity, key=scarcity.get))
         pool[flower] -= 1
         try:
-            stress[flower] = demand[flower] / pool[flower]
+            scarcity[flower] = demand[flower] / pool[flower]
         except ZeroDivisionError:
-            del pool[flower], stress[flower]
+            del pool[flower], scarcity[flower]
 
 
 def read_inputs(fp: TextIO) -> Iterator[str]:
