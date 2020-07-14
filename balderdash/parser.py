@@ -1,5 +1,5 @@
-from functools import partial
 from collections import Counter
+from functools import partial
 from operator import attrgetter
 from typing import Iterable, Iterator
 
