@@ -1,3 +1,5 @@
+"""An over-engineered solution to a small problem: Balderdash!"""
+
 import sys
 from collections import Counter
 from itertools import chain, islice
@@ -5,6 +7,8 @@ from typing import Iterable, Iterator, Optional, TextIO
 
 from .parser import generate_designs, generate_flowers
 from .types import Bouquet, Design, Flower, FlowerCounter
+
+__version__ = "0"  # Forever at nil
 
 
 def bouquet_from_designs(
