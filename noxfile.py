@@ -11,3 +11,10 @@ def lint(session):
 def type(session):
     session.install("mypy")
     session.run("mypy")
+
+
+@nox.session(python="3.8")
+def test(session):
+    session.install("pytest", "pytest-cov", "coverage[toml]")
+    session.install(".")
+    session.run("python", "-m", "pytest", "--cov")
