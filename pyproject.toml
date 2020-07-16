@@ -17,5 +17,5 @@ requires = ["lark-parser"]
 requires-python = ">=3.8"
 description-file = "README.md"
 
-[tool.flit.metadata.requires-extra]
-test = ["nox"]
+[tool.flit.scripts]
+balderdash = "balderdash:main"
