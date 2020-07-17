@@ -77,6 +77,11 @@ def test_create_design_redefined_required_flower(design_parser):
         design_parser("AL2a2a5")
 
 
+def test_create_design_required_flowers_not_alphabetized(design_parser):
+    with pytest.raises(ValueError, match="Required flowers not in alphabetical order"):
+        design_parser("AL2b2a5")
+
+
 def test_generate_designs():
     patterns = ["AL1a5", "BS2x2y5"]
     designs = list(generate_designs(patterns))
