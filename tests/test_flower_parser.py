@@ -1,21 +1,10 @@
-from functools import partial
 from itertools import product, zip_longest
 from string import ascii_lowercase
 
 import pytest
 
-from balderdash.parser import (
-    get_parser,
-    create_flower,
-    generate_flowers,
-)
+from balderdash.parser import generate_flowers
 from balderdash.types import Flower
-
-
-@pytest.fixture
-def flower_parser():
-    parser = get_parser("flower")
-    return partial(create_flower, parser)
 
 
 @pytest.mark.parametrize("size", "SL")

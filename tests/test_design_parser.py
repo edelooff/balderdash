@@ -1,21 +1,10 @@
-from functools import partial
 from itertools import zip_longest
 from string import ascii_uppercase
 
 import pytest
 
-from balderdash.parser import (
-    get_parser,
-    create_design,
-    generate_designs,
-)
+from balderdash.parser import generate_designs
 from balderdash.types import Design
-
-
-@pytest.fixture
-def design_parser():
-    parser = get_parser("design")
-    return partial(create_design, parser)
 
 
 @pytest.mark.parametrize("name", ascii_uppercase)
