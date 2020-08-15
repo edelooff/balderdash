@@ -2,11 +2,12 @@
 
 import sys
 from collections import Counter
-from itertools import chain, islice
-from typing import Iterable, Iterator, Optional, TextIO
+from itertools import islice
+from typing import Iterable, Iterator, Optional
 
 from .parser import generate_designs, generate_flowers
 from .types import Bouquet, Design, Flower, FlowerCounter
+from .utils import bouquet_to_string, design_complexity, flower_demand, read_inputs
 
 __version__ = "0"  # Forever at nil
 
@@ -25,26 +26,6 @@ def bouquet_from_designs(
                 pool -= flowers
                 return Bouquet(design.name, design.size, flowers)
     return None
-
-
-def bouquet_to_string(bouquet: Bouquet) -> str:
-    """Returns a string representation of the given Bouquet."""
-    flowers = sorted(bouquet.flowers.items())
-    flowers_formatted = (f"{count}{flower.species}" for flower, count in flowers)
-    return f"{bouquet.name}{bouquet.size}{''.join(flowers_formatted)}"
-
-
-def design_complexity(design: Design) -> int:
-    """Returns an approximation of the design's complexity to create."""
-    diversity = 3 * len(design.required)
-    abundance = 2 * sum(design.required.values())
-    return diversity + abundance + design.additional
-
-
-def flower_demand(designs: Iterable[Design]) -> FlowerCounter:
-    """Returns a dict of flowers and amount required across all designs."""
-    elements = (design.required.elements() for design in designs)
-    return Counter(chain.from_iterable(elements))
 
 
 def generate_bouquets(
@@ -71,12 +52,6 @@ def select_filler(pool: FlowerCounter, demand: FlowerCounter) -> Iterator[Flower
             scarcity[flower] = demand[flower] / pool[flower]
         except ZeroDivisionError:
             del pool[flower], scarcity[flower]
-
-
-def read_inputs(fp: TextIO) -> Iterator[str]:
-    """Yields lines from the given filepointer until an empty line is hit."""
-    while line := fp.readline().strip():
-        yield line
 
 
 def main() -> None:
