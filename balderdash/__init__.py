@@ -32,14 +32,17 @@ def generate_bouquets(
     flowers: Iterator[Flower], designs: Iterable[Design], buffer: int = 250
 ) -> Iterator[Bouquet]:
     demand = flower_demand(designs)
-    pool: FlowerCounter = Counter()
-    while bundle := list(islice(flowers, buffer)):
-        pool.update(bundle)
-        if bouquet := bouquet_from_designs(designs, pool, demand):
-            yield bouquet
-            buffer = sum(bouquet.flowers.values())
-    while bouquet := bouquet_from_designs(designs, pool, demand):
-        yield bouquet
+    pool: FlowerCounter = Counter(islice(flowers, buffer))
+    try:
+        while True:
+            if bouquet := bouquet_from_designs(designs, pool, demand):
+                under_buffer = max(0, buffer - sum(pool.values()))
+                pool.update(islice(flowers, under_buffer))
+                yield bouquet
+            else:
+                pool[next(flowers)] += 1
+    except StopIteration:
+        return
 
 
 def select_filler(pool: FlowerCounter, demand: FlowerCounter) -> Iterator[Flower]:
