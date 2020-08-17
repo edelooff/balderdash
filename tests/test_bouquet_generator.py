@@ -1,9 +1,9 @@
 from itertools import zip_longest
 
+import pytest
+
 from balderdash import generate_bouquets
 from balderdash.parser import generate_designs, generate_flowers
-
-import pytest
 
 
 @pytest.fixture

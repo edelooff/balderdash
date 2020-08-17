@@ -2,7 +2,7 @@ from functools import partial
 
 import pytest
 
-from balderdash.parser import get_parser, create_design, create_flower
+from balderdash.parser import create_design, create_flower, get_parser
 
 
 @pytest.fixture(scope="session")

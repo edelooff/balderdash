@@ -30,3 +30,7 @@ source = ["balderdash"]
 [tool.coverage.report]
 fail_under = 100
 show_missing = true
+
+[tool.isort]
+profile = "black"
+atomic = true

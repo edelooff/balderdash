@@ -7,8 +7,8 @@ import pytest
 from balderdash import generate_designs
 from balderdash.types import Bouquet, Flower
 from balderdash.utils import (
-    design_complexity,
     bouquet_to_string,
+    design_complexity,
     flower_demand,
     read_inputs,
 )
