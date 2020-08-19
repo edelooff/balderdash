@@ -18,6 +18,8 @@ def create_design(parser: Lark, design: str) -> Design:
     for count, species in map(attrgetter("children"), required_flowers):
         if (flower := Flower(str(species), str(size))) in required:
             raise ValueError(f"Multiple definitions of same required flower {flower}")
+        if any(flower.species < current.species for current in required):
+            raise ValueError("Required flowers not in alphabetical order")
         required[flower] = int(count)
     if (additional := int(str(total_count)) - sum(required.values())) < 0:
         raise ValueError("Sum of required flowers greater than total size")
