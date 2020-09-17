@@ -3,7 +3,7 @@ from string import ascii_lowercase
 
 import pytest
 
-from balderdash.parser import generate_flowers
+from balderdash.parser import flower_generator
 from balderdash.types import Flower
 
 
@@ -30,9 +30,9 @@ def test_create_flower_bad_syntax(flower_parser, pattern):
         flower_parser(pattern)
 
 
-def test_generate_flowers():
+def test_flower_generator():
     patterns = ["".join(flower) for flower in product(ascii_lowercase, "SL")]
-    flowers = list(generate_flowers(patterns))
+    flowers = list(flower_generator(patterns))
     for flower, (species, size) in zip_longest(flowers, patterns):
         assert isinstance(flower, Flower)
         assert flower.species == species

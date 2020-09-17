@@ -34,16 +34,16 @@ def create_flower(parser: Lark, flower: str) -> Flower:
     return Flower(*map(str, tree.children))
 
 
-def generate_flowers(flowers: Iterable[str]) -> Iterator[Flower]:
-    """Yields parsed Flowers from an iterable of flower specifications."""
-    parser = get_parser("flower")
-    return map(partial(create_flower, parser), flowers)
-
-
-def generate_designs(designs: Iterable[str]) -> Iterator[Design]:
+def design_generator(designs: Iterable[str]) -> Iterator[Design]:
     """Yields parsed Designs from an iterable of design specifications."""
     parser = get_parser("design")
     return map(partial(create_design, parser), designs)
+
+
+def flower_generator(flowers: Iterable[str]) -> Iterator[Flower]:
+    """Yields parsed Flowers from an iterable of flower specifications."""
+    parser = get_parser("flower")
+    return map(partial(create_flower, parser), flowers)
 
 
 def get_parser(start: str) -> Lark:
