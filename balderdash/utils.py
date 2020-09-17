@@ -8,8 +8,8 @@ from .types import Bouquet, Design, FlowerCounter
 def bouquet_to_string(bouquet: Bouquet) -> str:
     """Returns a string representation of the given Bouquet."""
     flowers = sorted(bouquet.flowers.items())
-    flowers_formatted = (f"{count}{flower.species}" for flower, count in flowers)
-    return f"{bouquet.name}{bouquet.size}{''.join(flowers_formatted)}"
+    flower_quantities = (f"{count}{flower.species}" for flower, count in flowers)
+    return "".join(chain(bouquet.name, bouquet.size, flower_quantities))
 
 
 def design_complexity(design: Design) -> int:
@@ -25,7 +25,7 @@ def flower_demand(designs: Iterable[Design]) -> FlowerCounter:
     return Counter(chain.from_iterable(elements))
 
 
-def read_inputs(fp: TextIO) -> Iterator[str]:
+def read_lines(fp: TextIO) -> Iterator[str]:
     """Yields lines from the given filepointer until an empty line is hit."""
     while line := fp.readline().strip():
         yield line

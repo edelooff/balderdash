@@ -3,7 +3,7 @@ from string import ascii_uppercase
 
 import pytest
 
-from balderdash.parser import generate_designs
+from balderdash.parser import design_generator
 from balderdash.types import Design
 
 
@@ -71,9 +71,9 @@ def test_create_design_required_flowers_not_alphabetized(design_parser):
         design_parser("AL2b2a5")
 
 
-def test_generate_designs():
+def test_design_generator():
     patterns = ["AL1a5", "BS2x2y5"]
-    designs = list(generate_designs(patterns))
+    designs = list(design_generator(patterns))
     for design, pattern in zip_longest(designs, patterns):
         assert isinstance(design, Design)
         assert design.name == pattern[0]

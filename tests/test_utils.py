@@ -4,13 +4,13 @@ from string import ascii_uppercase
 
 import pytest
 
-from balderdash import generate_designs
+from balderdash import design_generator
 from balderdash.types import Bouquet, Flower
 from balderdash.utils import (
     bouquet_to_string,
     design_complexity,
     flower_demand,
-    read_inputs,
+    read_lines,
 )
 
 
@@ -51,7 +51,7 @@ def test_bouquet_string_flower_specification(flowers, expected):
     ],
 )
 def test_design_complexity_comparison(design_strings, expected_name):
-    designs = list(generate_designs(design_strings))
+    designs = list(design_generator(design_strings))
     ordered = sorted(designs, key=design_complexity)
     for design, expected_name in zip(ordered, expected_name):
         assert design.name == expected_name
@@ -74,7 +74,7 @@ def test_design_complexity_comparison(design_strings, expected_name):
     ],
 )
 def test_flower_demand(design_strings, counts):
-    designs = list(generate_designs(design_strings))
+    designs = list(design_generator(design_strings))
     expected_counts = {Flower(*flower): count for flower, count in counts.items()}
     assert flower_demand(designs) == expected_counts
 
@@ -88,5 +88,5 @@ def test_flower_demand(design_strings, counts):
         pytest.param("one\n\nnew-block", ["one"], id="empty line separates block"),
     ],
 )
-def test_read_inputs(input, expected):
-    assert list(read_inputs(StringIO(input))) == expected
+def test_read_lines(input, expected):
+    assert list(read_lines(StringIO(input))) == expected
