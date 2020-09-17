@@ -8,8 +8,8 @@ from .types import Bouquet, Design, FlowerCounter
 def bouquet_to_string(bouquet: Bouquet) -> str:
     """Returns a string representation of the given Bouquet."""
     flowers = sorted(bouquet.flowers.items())
-    flowers_formatted = (f"{count}{flower.species}" for flower, count in flowers)
-    return f"{bouquet.name}{bouquet.size}{''.join(flowers_formatted)}"
+    flower_quantities = (f"{count}{flower.species}" for flower, count in flowers)
+    return "".join(chain(bouquet.name, bouquet.size, flower_quantities))
 
 
 def design_complexity(design: Design) -> int:
