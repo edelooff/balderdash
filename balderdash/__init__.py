@@ -1,6 +1,6 @@
 """An over-engineered solution to a small problem: Balderdash!"""
 
-import sys
+from argparse import ArgumentParser, FileType
 from collections import Counter
 from itertools import islice
 from typing import Iterable, Iterator, Optional
@@ -58,8 +58,24 @@ def select_filler(pool: FlowerCounter, demand: FlowerCounter) -> Iterator[Flower
 
 
 def main() -> None:
-    designs = list(generate_designs(read_inputs(sys.stdin)))
+    parser = ArgumentParser()
+    parser.add_argument(
+        "infile",
+        nargs="?",
+        default="-",
+        type=FileType("r"),
+        help="File with design and flower inputs, to use instead of stdin",
+    )
+    parser.add_argument(
+        "--buffer",
+        default=250,
+        type=int,
+        help="Number of flowers to collect before bouquet creation (default: 250)",
+    )
+    args = parser.parse_args()
+
+    designs = list(generate_designs(read_inputs(args.infile)))
     designs.sort(key=design_complexity, reverse=True)
-    flowers = generate_flowers(read_inputs(sys.stdin))
-    for bouquet in generate_bouquets(flowers, designs):
+    flowers = generate_flowers(read_inputs(args.infile))
+    for bouquet in generate_bouquets(flowers, designs, buffer=args.buffer):
         print(bouquet_to_string(bouquet))
