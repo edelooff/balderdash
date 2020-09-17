@@ -7,7 +7,7 @@ from typing import Iterable, Iterator, Optional
 
 from .parser import generate_designs, generate_flowers
 from .types import Bouquet, Design, Flower, FlowerCounter
-from .utils import bouquet_to_string, design_complexity, flower_demand, read_inputs
+from .utils import bouquet_to_string, design_complexity, flower_demand, read_lines
 
 __version__ = "0"  # Forever at nil
 
@@ -74,8 +74,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    designs = list(generate_designs(read_inputs(args.infile)))
+    designs = list(generate_designs(read_lines(args.infile)))
     designs.sort(key=design_complexity, reverse=True)
-    flowers = generate_flowers(read_inputs(args.infile))
+    flowers = generate_flowers(read_lines(args.infile))
     for bouquet in generate_bouquets(flowers, designs, buffer=args.buffer):
         print(bouquet_to_string(bouquet))

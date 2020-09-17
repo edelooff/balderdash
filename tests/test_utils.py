@@ -10,7 +10,7 @@ from balderdash.utils import (
     bouquet_to_string,
     design_complexity,
     flower_demand,
-    read_inputs,
+    read_lines,
 )
 
 
@@ -88,5 +88,5 @@ def test_flower_demand(design_strings, counts):
         pytest.param("one\n\nnew-block", ["one"], id="empty line separates block"),
     ],
 )
-def test_read_inputs(input, expected):
-    assert list(read_inputs(StringIO(input))) == expected
+def test_read_lines(input, expected):
+    assert list(read_lines(StringIO(input))) == expected

@@ -25,7 +25,7 @@ def flower_demand(designs: Iterable[Design]) -> FlowerCounter:
     return Counter(chain.from_iterable(elements))
 
 
-def read_inputs(fp: TextIO) -> Iterator[str]:
+def read_lines(fp: TextIO) -> Iterator[str]:
     """Yields lines from the given filepointer until an empty line is hit."""
     while line := fp.readline().strip():
         yield line
